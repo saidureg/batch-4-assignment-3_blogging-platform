@@ -1,49 +1,36 @@
 import { Request, Response } from 'express';
-import { AuthValidations } from './auth.validation';
 import { authServices } from './auth.service';
-import { userValidations } from '../User/user.validation';
+import catchAsync from '../../utils/catchAsync';
 
-const createUser = async (req: Request, res: Response) => {
-  try {
-    const validatedUser = await userValidations.userValidationSchema.parseAsync(
-      req.body,
-    );
+const createUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await authServices.createUserIntoDB(req.body);
+  res.status(201).json({
+    success: true,
+    message: 'User registered successfully',
+    statusCode: 201,
+    data: {
+      _id: result._id,
+      name: result.name,
+      email: result.email,
+    },
+  });
+});
 
-    const result = await authServices.createUserIntoDB(validatedUser);
-    res.status(201).json({
-      message: 'User registered successfully',
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: 'Internal server error',
-      success: false,
-      error,
-    });
-  }
-};
+const loginUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await authServices.loginUser(req.body);
 
-const loginUser = async (req: Request, res: Response) => {
-  try {
-    const validatedUser =
-      await AuthValidations.loginValidationSchema.parseAsync(req.body);
+  // res.cookie('token', result.token, {
+  //   expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  //   httpOnly: true,
+  // });
 
-    const result = await authServices.loginUser(validatedUser);
-    res.status(200).json({
-      success: true,
-      message: 'Login successful',
-      status: 200,
-      data: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: 'Internal server error',
-      success: false,
-      error,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    message: 'Login successful',
+    statusCode: 200,
+    data: result,
+  });
+});
 
 export const authController = {
   createUser,

@@ -1,3 +1,4 @@
+// import mongoose from 'mongoose';
 import { z } from 'zod';
 
 const blogValidationSchema = z.object({
@@ -9,7 +10,6 @@ const blogValidationSchema = z.object({
     .string()
     .min(3, 'Content must be at least 3 characters long')
     .max(5000, 'Content must be at most 5000 characters long'),
-  author: z.string(),
   isPublished: z.boolean().default(true),
 });
 

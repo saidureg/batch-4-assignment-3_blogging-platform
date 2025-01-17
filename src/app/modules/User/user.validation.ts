@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const userValidationSchema = z.object({
+const userRegisterValidationSchema = z.object({
   name: z.string({
     invalid_type_error: 'Name must be a string.',
   }),
@@ -17,5 +17,5 @@ const userValidationSchema = z.object({
 });
 
 export const userValidations = {
-  userValidationSchema,
+  userRegisterValidationSchema,
 };

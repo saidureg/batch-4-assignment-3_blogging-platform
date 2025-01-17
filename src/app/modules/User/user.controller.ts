@@ -1,22 +1,15 @@
 import { Request, Response } from 'express';
 import { userServices } from './user.service';
+import catchAsync from '../../utils/catchAsync';
 
-const getAllUsers = async (req: Request, res: Response) => {
-  try {
-    const result = await userServices.getAllUsersFromDB();
-    res.status(200).json({
-      message: 'All users fetched successfully',
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: 'Internal server error',
-      success: false,
-      error,
-    });
-  }
-};
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await userServices.getAllUsersFromDB();
+  res.status(200).json({
+    message: 'All users fetched successfully',
+    success: true,
+    data: result,
+  });
+});
 
 export const userController = {
   getAllUsers,

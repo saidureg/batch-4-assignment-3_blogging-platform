@@ -2,7 +2,6 @@ import { model, Schema } from 'mongoose';
 import { IUser, UserModel } from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
-import { console } from 'inspector';
 
 const userSchema = new Schema<IUser, UserModel>(
   {
@@ -57,8 +56,6 @@ userSchema.statics.isPasswordMatched = async function (
   plainTextPassword: string,
   hashedPassword: string,
 ) {
-  console.log('plainTextPassword', plainTextPassword);
-  console.log('hashedPassword', hashedPassword);
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
