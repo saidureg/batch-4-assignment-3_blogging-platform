@@ -8,6 +8,7 @@ import { blogValidations } from './blog.validation';
 const router = express.Router();
 
 router.get('/', blogController.getAllBlogs);
+
 router.post(
   '/',
   auth(USER_ROLE.user),
@@ -15,5 +16,14 @@ router.post(
   blogController.createBlog,
 );
 router.get('/:id', blogController.getBlogById);
+
+router.patch(
+  '/:id',
+  auth(USER_ROLE.user),
+  validateRequest(blogValidations.blogValidationsUpdateSchema),
+  blogController.updateBlogById,
+);
+
+router.delete('/:id', auth(USER_ROLE.user), blogController.deleteBlogById);
 
 export const blogRoutes = router;

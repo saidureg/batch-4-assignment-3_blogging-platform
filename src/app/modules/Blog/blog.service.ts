@@ -17,23 +17,80 @@ const createBlogIntoDB = async (payload: IBlog) => {
   return result.populate('author');
 };
 
-const getAllBlogsFromDB = async () => {
-  const result = await Blog.find();
-  return result;
-};
-
 const getBlogByIdFromDB = async (id: string) => {
   const result = await Blog.findById(id);
   return result;
 };
 
-const updateBlogByIdFromDB = async (id: string, payload: IBlog) => {
-  const result = await Blog.findByIdAndUpdate(id, payload, { new: true });
+const updateBlogByIdFromDB = async (
+  id: string,
+  payload: IBlog,
+  userId: string,
+) => {
+  if (!payload.author) {
+    throw new AppError(400, 'Author is required');
+  }
+
+  const blog = await Blog.findById(id);
+
+  if (!blog) {
+    throw new AppError(404, 'Blog not found');
+  }
+
+  if (blog.author.toString() !== userId) {
+    throw new AppError(403, 'You are not authorized to update this blog');
+  }
+
+  const result = await Blog.findByIdAndUpdate(id, payload, {
+    new: true,
+  }).populate('author');
   return result;
 };
 
-const deleteBlogByIdFromDB = async (id: string) => {
-  const result = await Blog.findByIdAndDelete(id);
+const deleteBlogByIdFromDB = async (id: string, userId: string) => {
+  const blog = await Blog.findById(id);
+
+  if (!blog) {
+    throw new AppError(404, 'Blog not found');
+  }
+
+  if (blog.author.toString() !== userId) {
+    throw new AppError(403, 'You are not authorized to delete this blog');
+  }
+
+  await Blog.findByIdAndDelete(id);
+
+  return { message: 'Blog deleted successfully' };
+};
+
+const getAllBlogsFromDB = async (queryParams: Record<string, unknown>) => {
+  const { search, sortBy, sortOrder, filter } = queryParams;
+
+  const query = {} as Record<string, unknown>;
+
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      {
+        content: { $regex: search, $options: 'i' },
+      },
+    ];
+  }
+
+  if (filter) {
+    query.author = filter;
+  }
+
+  const order = {} as { [key: string]: 1 | -1 };
+
+  if (sortBy) {
+    order[sortBy as string] = sortOrder === 'desc' ? -1 : 1;
+  }
+
+  const result = await Blog.find(query)
+    .sort(order)
+    .populate('author', 'name email');
+
   return result;
 };
 

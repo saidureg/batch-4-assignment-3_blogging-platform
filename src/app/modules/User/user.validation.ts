@@ -16,6 +16,22 @@ const userRegisterValidationSchema = z.object({
   isBlocked: z.boolean().default(false),
 });
 
+const updateUserValidationSchema = z.object({
+  name: z
+    .string({
+      invalid_type_error: 'Name must be a string.',
+    })
+    .optional(),
+  email: z
+    .string({
+      invalid_type_error: 'Email must be a string.',
+    })
+    .optional(),
+  role: z.enum(['user', 'admin']).default('user').optional(),
+  isBlocked: z.boolean().default(false),
+});
+
 export const userValidations = {
   userRegisterValidationSchema,
+  updateUserValidationSchema,
 };
