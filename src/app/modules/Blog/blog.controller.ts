@@ -18,11 +18,19 @@ const createBlog = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllBlogs = catchAsync(async (req: Request, res: Response) => {
-  const result = await blogServices.getAllBlogsFromDB();
+  const result = await blogServices.getAllBlogsFromDB(req.query);
   res.status(200).json({
     success: true,
     message: 'All blogs fetched successfully',
-    data: result,
+    statusCode: 200,
+    data: [
+      ...result.map((blog) => ({
+        _id: blog._id,
+        title: blog.title,
+        content: blog.content,
+        author: blog.author,
+      })),
+    ],
   });
 });
 
@@ -37,8 +45,41 @@ const getBlogById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateBlogById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await blogServices.updateBlogByIdFromDB(
+    id,
+    req.body,
+    req.body.author,
+  );
+
+  res.status(200).json({
+    success: true,
+    message: 'Blog updated successfully',
+    statusCode: 200,
+    data: {
+      _id: result?._id,
+      title: result?.title,
+      content: result?.content,
+      author: result?.author,
+    },
+  });
+});
+
+const deleteBlogById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await blogServices.deleteBlogByIdFromDB(id, req.body.author);
+  res.status(200).json({
+    success: true,
+    message: result.message,
+    statusCode: 200,
+  });
+});
+
 export const blogController = {
   createBlog,
   getAllBlogs,
   getBlogById,
+  updateBlogById,
+  deleteBlogById,
 };

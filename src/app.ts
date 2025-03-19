@@ -6,6 +6,7 @@ import { authRoutes } from './app/modules/Auth/auth.route';
 import { blogRoutes } from './app/modules/Blog/blog.route';
 import globalErrorHandler from './app/middleware/globalErrorHandler';
 import notFound from './app/middleware/notFound';
+import { adminRoutes } from './app/modules/Admin/admin.route';
 const app: Application = express();
 
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use(
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the Blogging Platform');
